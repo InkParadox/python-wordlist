@@ -15,6 +15,9 @@ def txtWriter(index, start, end, batch, path):
 
         for i in product(ascii_lowercase, repeat = j):
 
+            words_list.append("".join(i))
+            count += 1
+
             if count % batch == 0 and count > 2:
 
                 for itr in range (0, len (words_list)):
@@ -28,8 +31,8 @@ def txtWriter(index, start, end, batch, path):
 
                 f = open(path + str(j) + "-character-iteration-part-" + str(count//batch) + ".txt", "a")
 
-            words_list.append("".join(i))
-            count += 1
+
+            
 
     f.close()
 
