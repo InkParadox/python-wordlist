@@ -19,6 +19,8 @@ def writer(wordsList, filename):
     
     f.close()
 
+    # lock.release()
+
     endTime = datetime.datetime.now()
     print(endTime - startTime)
 
@@ -31,25 +33,37 @@ def txtWriter(start, batch, path):
 
     for i in product(ascii_lowercase, repeat = start):
 
+        wordsList.append("".join(i))
+        count += 1
+
         if count % batch == 0 and count > 1: 
 
             filename = path + str(start) + "-character-iteration-part-" + str(count//batch) + ".txt"
 
-            p1 = mp.Process(target = writer, args=(wordsList, filename))
-            processes.append(p1)
-            p1.start()
+            batchPointer1, batchPointer2 = 0, 1000000
+
+            for i in range(0,10):
+
+                p = mp.Process(target = writer, args=(wordsList[batchPointer1:batchPointer2], filename))
+                # p = threading.Thread(target = writer, args=(wordsList[batchPointer1:batchPointer2], filename))
+                p.start()
+                processes.append(p)
+
+                batchPointer1 = batchPointer2
+                batchPointer2 += 1000000
 
             wordsList.clear()
 
-        wordsList.append("".join(i))
-        count += 1
 
     filename = path + str(start) + "-character-iteration-part-" + str(count//batch) + ".txt"
-
     p = mp.Process(target = writer, args=[wordsList, filename])
+    # p = threading.Thread(target = writer, args=[wordsList, filename])
     processes.append(p)
     p.start()
     wordsList.clear()
+
+    # for i in processes:
+    #     i.start()
 
     for i in processes:
         i.join()
