@@ -1,4 +1,3 @@
-
 from itertools import product
 from string import ascii_lowercase
 import argparse
@@ -6,11 +5,13 @@ import multiprocessing as mp
 import threading
 import datetime
     
-# mp.Pool(processes = cpu).map(
 
 def writer(wordsList, filename):
 
     startTime = datetime.datetime.now()
+
+    # l = mp.Lock()
+    # l.acquire()
 
     f = open(filename, "a")
 
@@ -19,7 +20,7 @@ def writer(wordsList, filename):
     
     f.close()
 
-    # lock.release()
+    # l.release()
 
     endTime = datetime.datetime.now()
     print(endTime - startTime)
@@ -40,30 +41,18 @@ def txtWriter(start, batch, path):
 
             filename = path + str(start) + "-character-iteration-part-" + str(count//batch) + ".txt"
 
-            batchPointer1, batchPointer2 = 0, 1000000
-
-            for i in range(0,10):
-
-                p = mp.Process(target = writer, args=(wordsList[batchPointer1:batchPointer2], filename))
-                # p = threading.Thread(target = writer, args=(wordsList[batchPointer1:batchPointer2], filename))
-                p.start()
-                processes.append(p)
-
-                batchPointer1 = batchPointer2
-                batchPointer2 += 1000000
+            p = mp.Process(target = writer, args=(wordsList, filename))
+            p.start()
+            processes.append(p)
 
             wordsList.clear()
 
 
-    filename = path + str(start) + "-character-iteration-part-" + str(count//batch) + ".txt"
+    filename = path + str(start) + "-character-iteration-part-" + str((count//batch)+1) + ".txt"
     p = mp.Process(target = writer, args=[wordsList, filename])
-    # p = threading.Thread(target = writer, args=[wordsList, filename])
     processes.append(p)
     p.start()
     wordsList.clear()
-
-    # for i in processes:
-    #     i.start()
 
     for i in processes:
         i.join()
