@@ -40,7 +40,7 @@ def txtWriter(start, batch, path):
             wordsList.clear()
 
 
-    filename = path + str(start) + "-characters/" + str(start) + "character-iteration-part-" + str((count//batch)+1) + ".txt"
+    filename = path + str(start) + "-characters/" + str(start) + "-character-iteration-part-" + str((count//batch)+1) + ".txt"
     p = mp.Process(target = writer, args=[wordsList, filename, str((count//batch)+1)])
     processes.append(p)
     p.start()
