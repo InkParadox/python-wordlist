@@ -63,9 +63,19 @@ if __name__ == "__main__":
     startTime = datetime.datetime.now()
 
     start = arguments.start
-    end = arguments.end
+    
+    if arguments.end:
+        end = arguments.end
+    else:
+        end = start
 
     for i in range(start, end+1):
+
+        if os.path.exists("data/"):
+            pass
+        else:
+            os.mkdir("data/")
+
         if os.path.exists("data/" + str(i) + "-characters/"):
             pass
         else:
