@@ -8,8 +8,6 @@ import os
 
 def writer(wordsList, filename, number):
 
-    print("file " + number + "started")
-
     f = open(filename, "a+")
 
     for i in wordsList:
