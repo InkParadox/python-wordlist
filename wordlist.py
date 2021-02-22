@@ -8,8 +8,6 @@ import os
 
 def writer(wordsList, filename):
 
-    startTime = datetime.datetime.now()
-
     f = open(filename, "a+")
 
     for i in wordsList:
@@ -17,8 +15,7 @@ def writer(wordsList, filename):
     
     f.close()
 
-    endTime = datetime.datetime.now()
-    print(endTime - startTime)
+    print("file 1 done")
 
 
 def txtWriter(start, batch, path):
@@ -29,7 +26,6 @@ def txtWriter(start, batch, path):
 
     for i in product(ascii_lowercase, repeat = start):
 
-        print(i)
         wordsList.append("".join(i))
         count += 1
 
