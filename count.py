@@ -12,7 +12,11 @@ args = new_parser.parse_args()
 fileName = args.path + args.start + "-character-iteration-part-*.txt"
 fileNames = glob.glob(fileName)
 
-result = 0
+if len(fileNames) == 0:
+    print("no files for " + str(args.start) + " characters")
+    exit()
+
+total = 0
 
 for j in range(0,len(fileNames)):
 
@@ -21,8 +25,14 @@ for j in range(0,len(fileNames)):
     Content = file.read() 
     CoList = Content.split("\n") 
     
+    result = 0
+
     for i in CoList: 
         if i: 
             result += 1
+
+    total += result
             
     print("lines in file " + str(j+1) + " : " + str(result))
+
+print("total lines : " + str(total))

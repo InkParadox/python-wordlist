@@ -10,17 +10,12 @@ def writer(wordsList, filename):
 
     startTime = datetime.datetime.now()
 
-    # l = mp.Lock()
-    # l.acquire()
-
     f = open(filename, "a")
 
     for i in wordsList:
         f.write(i + "\n")
     
     f.close()
-
-    # l.release()
 
     endTime = datetime.datetime.now()
     print(endTime - startTime)
@@ -59,10 +54,8 @@ def txtWriter(start, batch, path):
 
 if __name__ == "__main__":
 
-    # create parser
     new_parser = argparse.ArgumentParser(description = "Create word list of combination a-z with number of character input.")
 
-    # add arguments
     new_parser.add_argument("-s", "--start", help = "character start count", type = int)
     new_parser.add_argument("-p", "--path", help = "path in which the files will be stored", type = str)
     new_parser.add_argument("-b", "--batch", help = "enter the batches in which the data is to be split", type = int)
