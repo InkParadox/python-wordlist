@@ -6,7 +6,9 @@ import argparse
 import os
     
 
-def writer(wordsList, filename):
+def writer(wordsList, filename, number):
+
+    print("file " + number + "started")
 
     f = open(filename, "a+")
 
@@ -15,7 +17,7 @@ def writer(wordsList, filename):
     
     f.close()
 
-    print("file 1 done")
+    print("file " + number + "closed")
 
 
 def txtWriter(start, batch, path):
@@ -33,7 +35,7 @@ def txtWriter(start, batch, path):
 
             filename = path + str(start) + "-characters/" + str(start) + "-character-iteration-part-" + str(count//batch) + ".txt"
 
-            p = mp.Process(target = writer, args=(wordsList, filename))
+            p = mp.Process(target = writer, args=[wordsList, filename, str(count//batch)])
             p.start()
             processes.append(p)
 
@@ -41,7 +43,7 @@ def txtWriter(start, batch, path):
 
 
     filename = path + str(start) + "-characters/" + str(start) + "character-iteration-part-" + str((count//batch)+1) + ".txt"
-    p = mp.Process(target = writer, args=[wordsList, filename])
+    p = mp.Process(target = writer, args=[wordsList, filename, str((count//batch)+1)])
     processes.append(p)
     p.start()
     wordsList.clear()
