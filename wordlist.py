@@ -2,6 +2,7 @@ from itertools import product
 from string import ascii_lowercase
 import multiprocessing as mp
 import datetime
+import psutil
 import argparse
 import os
     
@@ -36,9 +37,11 @@ def txtWriter(start, batch, path):
             p = mp.Process(target = writer, args=[wordsList, filename, str(count//batch)])
             p.start()
             processes.append(p)
-
             wordsList.clear()
-
+            
+            while psutil.virtual_memory()._asdict().get("percent") > 95:
+                print("memory exceeding 96% ... freeing up the RAM ... ")
+                time.sleep(3)
 
     filename = path + str(start) + "-characters/" + str(start) + "-character-iteration-part-" + str((count//batch)+1) + ".txt"
     p = mp.Process(target = writer, args=[wordsList, filename, str((count//batch)+1)])
