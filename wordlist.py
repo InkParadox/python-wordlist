@@ -4,6 +4,7 @@ import multiprocessing as mp
 import datetime
 import psutil
 import argparse
+import time
 import os
     
 
@@ -27,6 +28,10 @@ def txtWriter(start, batch, path):
 
     for i in product(ascii_lowercase, repeat = start):
 
+        while psutil.virtual_memory()._asdict().get("percent") > 95:
+            print("memory exceeding 96% ... freeing up the RAM ... ")
+            time.sleep(3)
+
         wordsList.append("".join(i))
         count += 1
 
@@ -39,9 +44,6 @@ def txtWriter(start, batch, path):
             processes.append(p)
             wordsList.clear()
             
-            while psutil.virtual_memory()._asdict().get("percent") > 95:
-                print("memory exceeding 96% ... freeing up the RAM ... ")
-                time.sleep(3)
 
     filename = path + str(start) + "-characters/" + str(start) + "-character-iteration-part-" + str((count//batch)+1) + ".txt"
     p = mp.Process(target = writer, args=[wordsList, filename, str((count//batch)+1)])
