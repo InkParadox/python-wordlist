@@ -38,6 +38,7 @@ def writer(wordsList, words, walletAddress):
             # print(bip44_addr.PublicKey().ToExtended())
             if bip44_addr.PublicKey().ToAddress() == walletAddress:
                 print(j)
+                print(datetime.datetime.now())
                 exit()
 
 
@@ -84,7 +85,7 @@ if __name__ == "__main__":
 
     arguments = new_parser.parse_args()
 
-    startTime = datetime.datetime.now()
+    print(datetime.datetime.now())
 
     start = arguments.start
     
@@ -104,6 +105,3 @@ if __name__ == "__main__":
     for i in iterProcesses:
         i.join()
 
-    endTime = datetime.datetime.now()
-
-    print(endTime - startTime)
