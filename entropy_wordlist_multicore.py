@@ -9,6 +9,7 @@ import datetime
 import psutil
 import time
 import os
+from numba import jit, cuda
    
 
 def writer(wordsList, words, walletAddress):
@@ -38,8 +39,6 @@ def writer(wordsList, words, walletAddress):
             if bip44_addr.PublicKey().ToAddress() == walletAddress:
                 print(j)
                 exit()
-
-        print(j + " done")
 
 
 def txtWriter(start, batch, words, walletAddress):
