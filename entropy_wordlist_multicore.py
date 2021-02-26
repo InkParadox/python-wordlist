@@ -9,18 +9,38 @@ import datetime
 import psutil
 import time
 import os
-from numba import jit, cuda
-   
 
-def writer(wordsList, words, walletAddress):
+mnemo = Mnemonic("english")
 
-    mnemo = Mnemonic("english")
+def rippleAddressChecker(wordsList, words, walletAddress, addressNum):
 
-    # words = "winner equip edge stock junior kangaroo avocado wild escape never guide embody comfort slide account cycle hip unaware field view warfare toss soup small"
+    for phrase in wordsList:
 
-    for j in wordsList:
+        seed = mnemo.to_seed(words, passphrase = phrase)
+        # Create from seed
+        bip44_mst = Bip44.FromSeed(seed, Bip44Coins.RIPPLE)
 
-        seed = mnemo.to_seed(words,passphrase=j)
+        # Derive account 0 for Bitcoin: m/44'/0'/0'
+        bip44_acc = bip44_mst.Purpose().Coin().Account(0)
+
+        # Derive the external chain: m/44'/0'/0'/0
+        bip44_change = bip44_acc.Change(Bip44Changes.CHAIN_EXT)
+
+        # Derive the addresses of the external chain: m/44'/0'/0'/0/i
+        for i in range(addressNum+1):
+            bip44_addr = bip44_change.AddressIndex(i)
+
+            # Check whether provided address is equal to the generated address
+            if bip44_addr.PublicKey().ToAddress() == walletAddress:
+                print(phrase)
+                print(datetime.datetime.now())
+                exit()
+
+def bitcoinAddressChecker(wordsList, words, walletAddress, addressNum):
+
+    for phrase in wordsList:
+
+        seed = mnemo.to_seed(words, passphrase = phrase)
         # Create from seed
         bip44_mst = Bip44.FromSeed(seed, Bip44Coins.BITCOIN)
 
@@ -31,44 +51,58 @@ def writer(wordsList, words, walletAddress):
         bip44_change = bip44_acc.Change(Bip44Changes.CHAIN_EXT)
 
         # Derive the first 20 addresses of the external chain: m/44'/0'/0'/0/i
-        for i in range(10):
+        for i in range(addressNum+1):
             bip44_addr = bip44_change.AddressIndex(i)
+
             # Print extended keys and address
             # print(bip44_addr.PrivateKey().ToExtended())
             # print(bip44_addr.PublicKey().ToExtended())
+
+            # Check whether provided address is equal to the generated address
             if bip44_addr.PublicKey().ToAddress() == walletAddress:
-                print(j)
+                print(phrase)
                 print(datetime.datetime.now())
                 exit()
 
-
-def txtWriter(start, batch, words, walletAddress):
+def txtWriter(start, batch, words, walletAddress, addressNum, coin):
 
     count = 0
     wordsList = []
     processes = []
 
-    for i in product(ascii_lowercase, repeat = start):
+    possibilities = 26**start
+    batch = possibilities//batch
 
-        while psutil.virtual_memory()._asdict().get("percent") > 95:
-            print("memory exceeding 96% ... freeing up the RAM ... ")
-            time.sleep(3)
+    for i in product(ascii_lowercase, repeat = start):
 
         wordsList.append("".join(i))
         count += 1
 
         if count % batch == 0 and count > 1: 
 
-            p = mp.Process(target = writer, args=[wordsList, words, walletAddress])
-            p.start()
-            processes.append(p)
-            wordsList.clear()
-            
+            if coin == "btc":
+                p = mp.Process(target = bitcoinAddressChecker, args=[wordsList, words, walletAddress, addressNum])
+                p.start()
+                processes.append(p)
+                wordsList.clear()
 
-    p = mp.Process(target = writer, args=[wordsList, words, walletAddress])
-    processes.append(p)
-    p.start()
-    wordsList.clear()
+            if coin == "xrp":
+                p = mp.Process(target = rippleAddressChecker, args=[wordsList, words, walletAddress, addressNum])
+                p.start()
+                processes.append(p)
+                wordsList.clear()
+
+    if coin == "btc":
+        p = mp.Process(target = bitcoinAddressChecker, args=[wordsList, words, walletAddress, addressNum])
+        p.start()
+        processes.append(p)
+        wordsList.clear()
+
+    if coin == "xrp":
+        p = mp.Process(target = bitcoinAddressChecker, args=[wordsList, words, walletAddress, addressNum])
+        p.start()
+        processes.append(p)
+        wordsList.clear()
 
     for i in processes:
         i.join()
@@ -77,11 +111,12 @@ if __name__ == "__main__":
 
     new_parser = argparse.ArgumentParser(description = "Create word list of combination a-z with number of character input.")
 
-    new_parser.add_argument("-s", "--start", help = "character start count", type = int)
-    new_parser.add_argument("-e", "--end", help = "character end count", type = int)
-    new_parser.add_argument("-b", "--batch", help = "enter the batches in which the data is to be split", type = int)
-    new_parser.add_argument("-w", "--words", help = "enter wallet address", type = str)
-    new_parser.add_argument("-a", "--address", help = "enter wallet address", type = str)
+    new_parser.add_argument("-s","--start", help = "character start count", type = int)
+    new_parser.add_argument("-e","--end", help = "character end count", type = int)
+    new_parser.add_argument("-w","--words", help = "enter wallet address", type = str)
+    new_parser.add_argument("-a","--address", help = "enter wallet address", type = str)
+    new_parser.add_argument("-c","--coin", help = "coin to search", type = str)
+    new_parser.add_argument("-n","--numberOfAddress", help = "number of addresses to search", type = int)
 
     arguments = new_parser.parse_args()
 
@@ -94,10 +129,12 @@ if __name__ == "__main__":
     else:
         end = start
 
+#==================================================================================================================================================
+
     iterProcesses = []
 
     for i in range(0, end+1 - start):
-        p = mp.Process(target = txtWriter, args = [start, arguments.batch, arguments.words, arguments.address])
+        p = mp.Process(target = txtWriter, args = [start, mp.cpu_count(), arguments.words, arguments.address, arguments.numberOfAddress, arguments.coin])
         p.start()
         iterProcesses.append(p)
         start += 1
