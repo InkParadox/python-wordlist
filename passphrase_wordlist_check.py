@@ -9,12 +9,14 @@ import datetime
 import psutil
 import time
 import os
+from numba import jit, cuda
 
-mnemo = Mnemonic("english")
 
 def rippleAddressChecker(wordsList, words, walletAddress, addressNum):
 
     for phrase in wordsList:
+
+        mnemo = Mnemonic("english")
 
         seed = mnemo.to_seed(words, passphrase = phrase)
         # Create from seed
@@ -35,11 +37,15 @@ def rippleAddressChecker(wordsList, words, walletAddress, addressNum):
                 print(phrase)
                 print(datetime.datetime.now())
                 exit()
+        
+    wordsList.clear()
 
 def bitcoinAddressChecker(wordsList, words, walletAddress, addressNum):
 
     for phrase in wordsList:
 
+        mnemo = Mnemonic("english")
+        
         seed = mnemo.to_seed(words, passphrase = phrase)
         # Create from seed
         bip44_mst = Bip44.FromSeed(seed, Bip44Coins.BITCOIN)
@@ -63,6 +69,9 @@ def bitcoinAddressChecker(wordsList, words, walletAddress, addressNum):
                 print(phrase)
                 print(datetime.datetime.now())
                 exit()
+        
+    wordsList.clear()
+
 
 def txtWriter(start, batch, words, walletAddress, addressNum, coin):
 
@@ -70,8 +79,9 @@ def txtWriter(start, batch, words, walletAddress, addressNum, coin):
     wordsList = []
     processes = []
 
-    possibilities = 26**start
-    batch = possibilities//batch
+    # possibilities = 26**start
+    # batch = possibilities//batch
+    # batch = batch//2
 
     for i in product(ascii_lowercase, repeat = start):
 
@@ -134,7 +144,7 @@ if __name__ == "__main__":
     iterProcesses = []
 
     for i in range(0, end+1 - start):
-        p = mp.Process(target = txtWriter, args = [start, mp.cpu_count(), arguments.words, arguments.address, arguments.numberOfAddress, arguments.coin])
+        p = mp.Process(target = txtWriter, args = [start, 30000, arguments.words, arguments.address, arguments.numberOfAddress, arguments.coin])
         p.start()
         iterProcesses.append(p)
         start += 1
