@@ -19,8 +19,6 @@ def rippleAddressChecker(wordsList, words, walletAddress, addressNum):
 
     for phrase in wordsList:
 
-        start = datetime.datetime.now()
-
         seed = mnemo.to_seed(words, passphrase = phrase)
         # Create from seed
         bip44_mst = Bip44.FromSeed(seed, Bip44Coins.RIPPLE)
@@ -41,16 +39,12 @@ def rippleAddressChecker(wordsList, words, walletAddress, addressNum):
                 print(datetime.datetime.now())
                 exit()
         
-        print(datetime.datetime.now()-start)
-        
     wordsList.clear()
 
 def bitcoinAddressChecker(wordsList, words, walletAddress, addressNum):
 
     for phrase in wordsList:
 
-        start = datetime.datetime.now()
-        
         seed = mnemo.to_seed(words, passphrase = phrase)
         # Create from seed
         bip44_mst = Bip44.FromSeed(seed, Bip44Coins.BITCOIN)
@@ -65,18 +59,12 @@ def bitcoinAddressChecker(wordsList, words, walletAddress, addressNum):
         for i in range(addressNum+1):
             bip44_addr = bip44_change.AddressIndex(i)
 
-            # Print extended keys and address
-            # print(bip44_addr.PrivateKey().ToExtended())
-            # print(bip44_addr.PublicKey().ToExtended())
-
             # Check whether provided address is equal to the generated address
             if bip44_addr.PublicKey().ToAddress() == walletAddress:
                 print(phrase)
                 print(datetime.datetime.now())
                 exit()
         
-        print(datetime.datetime.now()-start)
-
     wordsList.clear()
 
 
