@@ -12,11 +12,14 @@ import os
 from numba import jit, cuda
 
 
+mnemo = Mnemonic("english")
+
+
 def rippleAddressChecker(wordsList, words, walletAddress, addressNum):
 
     for phrase in wordsList:
 
-        mnemo = Mnemonic("english")
+        start = datetime.datetime.now()
 
         seed = mnemo.to_seed(words, passphrase = phrase)
         # Create from seed
@@ -38,13 +41,15 @@ def rippleAddressChecker(wordsList, words, walletAddress, addressNum):
                 print(datetime.datetime.now())
                 exit()
         
+        print(datetime.datetime.now()-start)
+        
     wordsList.clear()
 
 def bitcoinAddressChecker(wordsList, words, walletAddress, addressNum):
 
     for phrase in wordsList:
 
-        mnemo = Mnemonic("english")
+        start = datetime.datetime.now()
         
         seed = mnemo.to_seed(words, passphrase = phrase)
         # Create from seed
@@ -70,18 +75,16 @@ def bitcoinAddressChecker(wordsList, words, walletAddress, addressNum):
                 print(datetime.datetime.now())
                 exit()
         
+        print(datetime.datetime.now()-start)
+
     wordsList.clear()
 
 
-def txtWriter(start, batch, words, walletAddress, addressNum, coin):
+def batchHandler(start, batch, words, walletAddress, addressNum, coin):
 
     count = 0
     wordsList = []
     processes = []
-
-    # possibilities = 26**start
-    # batch = possibilities//batch
-    # batch = batch//2
 
     for i in product(ascii_lowercase, repeat = start):
 
@@ -144,7 +147,7 @@ if __name__ == "__main__":
     iterProcesses = []
 
     for i in range(0, end+1 - start):
-        p = mp.Process(target = txtWriter, args = [start, 30000, arguments.words, arguments.address, arguments.numberOfAddress, arguments.coin])
+        p = mp.Process(target = batchHandler, args = [start, 30000, arguments.words, arguments.address, arguments.numberOfAddress, arguments.coin])
         p.start()
         iterProcesses.append(p)
         start += 1
@@ -152,3 +155,4 @@ if __name__ == "__main__":
     for i in iterProcesses:
         i.join()
 
+# python passphrase_wordlist_check.py -s 4 -c "btc" -n 10 -w "physical fly just divert nothing mother parent napkin fantasy journey tenant invite snake timber inform zebra wheel field nothing nephew creek rather spike celery" -a "17o9ZYh6HyS5yYzY15Zeq9Xym3tFy4mG8Q"
