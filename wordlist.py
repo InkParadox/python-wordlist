@@ -72,15 +72,15 @@ if __name__ == "__main__":
 
     for i in range(start, end+1):
 
-        if os.path.exists("D:/data/"):
+        if os.path.exists(arguments.path):
             pass
         else:
-            os.mkdir("D:/data/")
+            os.mkdir(arguments.path)
 
-        if os.path.exists("D:/data/" + str(i) + "-characters/"):
+        if os.path.exists(arguments.path + str(i) + "-characters/"):
             pass
         else:
-            os.mkdir("D:/data/" + str(i) + "-characters/")
+            os.mkdir(arguments.path + str(i) + "-characters/")
 
     iterProcesses = []
 
