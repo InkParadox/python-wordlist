@@ -10,7 +10,7 @@ import os
 
 def writer(wordsList, filename, number):
 
-    f = open(filename, "a+")
+    f = open(filename, "a")
 
     for i in wordsList:
         f.write(i + "\n")
@@ -27,10 +27,6 @@ def txtWriter(start, batch, path):
     processes = []
 
     for i in product(ascii_lowercase, repeat = start):
-
-        while psutil.virtual_memory()._asdict().get("percent") > 95:
-            print("memory exceeding 96% ... freeing up the RAM ... ")
-            time.sleep(3)
 
         wordsList.append("".join(i))
         count += 1
@@ -76,15 +72,15 @@ if __name__ == "__main__":
 
     for i in range(start, end+1):
 
-        if os.path.exists("data/"):
+        if os.path.exists("D:/data/"):
             pass
         else:
-            os.mkdir("data/")
+            os.mkdir("D:/data/")
 
-        if os.path.exists("data/" + str(i) + "-characters/"):
+        if os.path.exists("D:/data/" + str(i) + "-characters/"):
             pass
         else:
-            os.mkdir("data/" + str(i) + "-characters/")
+            os.mkdir("D:/data/" + str(i) + "-characters/")
 
     iterProcesses = []
 

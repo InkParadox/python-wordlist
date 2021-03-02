@@ -14,6 +14,11 @@ from numba import jit, cuda
 
 mnemo = Mnemonic("english")
 
+def chunks(LIST, NUMBER_OF_PARTS):
+    # For item i in a range that is a length of l,
+    for i in range(0, len(LIST), NUMBER_OF_PARTS):
+        # Create an index range for l of n items:
+        yield LIST[i:i+NUMBER_OF_PARTS]
 
 def rippleAddressChecker(wordsList, words, walletAddress, addressNum):
 
@@ -82,10 +87,18 @@ def batchHandler(start, batch, words, walletAddress, addressNum, coin):
         if count % batch == 0 and count > 1: 
 
             if coin == "btc":
-                p = mp.Process(target = bitcoinAddressChecker, args=[wordsList, words, walletAddress, addressNum])
-                p.start()
-                processes.append(p)
+                chunkList = list(chunks(wordsList,mp.cpu_count()))
+
+                for chk in chunkList:
+                    p = mp.Process(target = bitcoinAddressChecker, args=[chk, words, walletAddress, addressNum])
+                    p.start()
+                    processes.append(p)
                 wordsList.clear()
+
+                for process in processes:
+                    process.join()
+
+                processes.clear()
 
             if coin == "xrp":
                 p = mp.Process(target = rippleAddressChecker, args=[wordsList, words, walletAddress, addressNum])
