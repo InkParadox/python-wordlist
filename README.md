@@ -6,7 +6,7 @@ mnemonic library: https://pypi.org/project/mnemonic/
 
 bip-utils library: https://pypi.org/project/bip-utils/
 
-python wordlist.py -s <letter-count> -b <batch-count> -p <path>
+Generate wordlist : `python wordlist.py -s <letter-count> -b <batch-count> -p <path>`
 
 can also use john the ripper as an alternative: 
 
