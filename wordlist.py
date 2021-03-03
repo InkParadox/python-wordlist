@@ -7,6 +7,11 @@ import argparse
 import time
 import os
     
+def chunks(LIST, NUMBER_OF_PARTS):
+    # For item i in a range that is a length of l,
+    for i in range(0, len(LIST), NUMBER_OF_PARTS):
+        # Create an index range for l of n items:
+        yield LIST[i:i+NUMBER_OF_PARTS]
 
 def writer(wordsList, filename, number):
 
@@ -18,7 +23,6 @@ def writer(wordsList, filename, number):
     f.close()
 
     print("file " + number + "closed")
-
 
 def txtWriter(start, batch, path):
 
@@ -33,19 +37,24 @@ def txtWriter(start, batch, path):
 
         if count % batch == 0 and count > 1: 
 
-            filename = path + str(start) + "-characters/" + str(start) + "-character-iteration-part-" + str(count//batch) + ".txt"
+            if count//batch > 6662:
+                filename = path + str(start) + "-characters/" + str(start) + "-character-iteration-part-" + str(count//batch) + ".txt"
 
-            p = mp.Process(target = writer, args=[wordsList, filename, str(count//batch)])
-            p.start()
-            processes.append(p)
-            wordsList.clear()
+                p = mp.Process(target = writer, args=[wordsList, filename, str(count//batch)])
+                p.start()
+                processes.append(p)
+                wordsList.clear()
+            else:
+                wordsList.clear()
             
-
-    filename = path + str(start) + "-characters/" + str(start) + "-character-iteration-part-" + str((count//batch)+1) + ".txt"
-    p = mp.Process(target = writer, args=[wordsList, filename, str((count//batch)+1)])
-    processes.append(p)
-    p.start()
-    wordsList.clear()
+    if count//batch > 6662:
+        filename = path + str(start) + "-characters/" + str(start) + "-character-iteration-part-" + str((count//batch)+1) + ".txt"
+        p = mp.Process(target = writer, args=[wordsList, filename, str((count//batch)+1)])
+        processes.append(p)
+        p.start()
+        wordsList.clear()
+    else:
+        wordsList.clear()
 
     for i in processes:
         i.join()
