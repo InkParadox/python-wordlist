@@ -6,14 +6,7 @@ mnemonic library: https://pypi.org/project/mnemonic/
 
 bip-utils library: https://pypi.org/project/bip-utils/
 
-
-### test case
-###### address : `1wsCETu4pcKTQdEb2BH9dVHb148UrrAiV` 
-###### path : `m/44'/0'/0'/0/0`
-###### passphrase : `yxze`
-###### seed : `winner equip edge stock junior kangaroo avocado wild escape never guide embody comfort slide account cycle hip unaware field view warfare toss soup small`
-
-
+python wordlist.py -s <letter-count> -b <batch-count> -p <path>
 
 can also use john the ripper as an alternative: 
 
