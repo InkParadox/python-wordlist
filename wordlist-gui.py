@@ -13,12 +13,13 @@ class Menu:
     def __init__(self):
         self.root = Tk()
         self.root.title("Word List Generator")
-        self.root.geometry("350x200")
+        self.root.geometry("330x200")
         
         self.path = StringVar()
         self.batch = IntVar()
         self.start = IntVar() 
         self.end = IntVar()
+        self.textFile = IntVar()
 
         self.frame1 = Frame(self.root, height = 150, width = 200, pady = 20)
         self.frame1.grid(row = 0, column = 0)
@@ -35,7 +36,7 @@ class Menu:
         self.endEntry = Entry(self.frame1, width = 15, textvariable = self.end)
         self.endEntry.grid(row = 0, column = 3, pady = 5)
 
-        self.pathLabel = Label(self.frame1, text = "Path : ")
+        self.pathLabel = Label(self.frame1, text = "Folder path : ")
         self.pathLabel.grid(row = 1, column = 0, padx = 5, pady = 5)
         self.pathEntry = Entry(self.frame1, width = 35, textvariable = self.path)
         self.pathEntry.grid(row = 1, column = 1, columnspan = 3, pady = 5)
@@ -45,8 +46,13 @@ class Menu:
         self.batchEntry = Entry(self.frame1, width = 35, textvariable = self.batch)
         self.batchEntry.grid(row = 2, column = 1, columnspan = 3, pady = 5)
 
-        self.generateButton = Button(self.frame2, text = "Generate words !", bg = "light gray", padx = 20, command = self.generateButtonClick)
-        self.generateButton.grid(row = 0, column = 0, pady = 10)
+        self.textFileLabel = Label(self.frame1, text = "Text file number : ")
+        self.textFileLabel.grid(row = 3, column = 0, padx = 5, pady = 5)
+        self.textFileEntry = Entry(self.frame1, width = 35, textvariable = self.textFile)
+        self.textFileEntry.grid(row = 3, column = 1, columnspan = 3, pady = 5)
+
+        self.generateButton = Button(self.frame2, text = "Generate words !", bg = "light gray", padx = 100, command = self.generateButtonClick)
+        self.generateButton.grid(row = 0, column = 0)
 
         self.root.mainloop()
 
@@ -54,9 +60,11 @@ class Menu:
 
         start = self.start.get()
 
-        path = self.path.get()
+        path = r""+self.path.get()
 
         batch = self.batch.get()
+
+        mid = self.textFile.get()
         
         if self.end.get():
             end = self.end.get()
@@ -68,7 +76,7 @@ class Menu:
         self.frame1.destroy()
         self.frame2.destroy()
         self.root.destroy()
-        time.sleep(10)
+
         for i in range(start, end+1):
 
             if os.path.exists(path):
@@ -84,7 +92,7 @@ class Menu:
         self.iterProcesses = []
 
         for i in range(0, end+1 - start):
-            self.p = mp.Process(target = txtWriter, args = [start, batch, path])
+            self.p = mp.Process(target = txtWriter, args = [start, batch, path, mid])
             self.p.start()
             self.iterProcesses.append(self.p)
             start += 1
@@ -104,7 +112,7 @@ def writer(wordsList, filename, number):
     print("file " + number + "closed")
 
 
-def txtWriter(start, batch, path):
+def txtWriter(start, batch, path, mid):
 
     count = 0
     wordsList = []
@@ -116,20 +124,26 @@ def txtWriter(start, batch, path):
         count += 1
 
         if count % batch == 0 and count > 1: 
-
-            filename = path + str(start) + "-characters/" + str(start) + "-character-iteration-part-" + str(count//batch) + ".txt"
-
-            p = mp.Process(target = writer, args=[wordsList, filename, str(count//batch)])
-            p.start()
-            processes.append(p)
-            wordsList.clear()
             
+            if count//batch > mid:
+                filename = path + str(start) + "-characters/" + str(start) + "-character-iteration-part-" + str(count//batch) + ".txt"
+                p = mp.Process(target = writer, args=[wordsList, filename, str(count//batch)])
+                p.start()
+                processes.append(p)
+                wordsList.clear()
 
-    filename = path + str(start) + "-characters/" + str(start) + "-character-iteration-part-" + str((count//batch)+1) + ".txt"
-    p = mp.Process(target = writer, args=[wordsList, filename, str((count//batch)+1)])
-    processes.append(p)
-    p.start()
-    wordsList.clear()
+            else:
+                wordsList.clear()
+            
+    if count//batch > mid:
+        filename = path + str(start) + "-characters/" + str(start) + "-character-iteration-part-" + str((count//batch)+1) + ".txt"
+        p = mp.Process(target = writer, args=[wordsList, filename, str((count//batch)+1)])
+        processes.append(p)
+        p.start()
+        wordsList.clear()
+
+    else:
+        wordsList.clear()
 
     for i in processes:
         i.join()
