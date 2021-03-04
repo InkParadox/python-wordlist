@@ -18,7 +18,7 @@ def writer(wordsList, filename, number):
 
     print("file " + number + "closed")
 
-def txtWriter(start, batch, path):
+def txtWriter(start, batch, path, mid):
 
     count = 0
     wordsList = []
@@ -31,18 +31,26 @@ def txtWriter(start, batch, path):
 
         if count % batch == 0 and count > 1: 
 
-            filename = path + str(start) + "-characters/" + str(start) + "-character-iteration-part-" + str(count//batch) + ".txt"
+            if count//batch > mid:
+                filename = path + str(start) + "-characters/" + str(start) + "-character-iteration-part-" + str(count//batch) + ".txt"
 
-            p = mp.Process(target = writer, args=[wordsList, filename, str(count//batch)])
-            p.start()
-            processes.append(p)
-            wordsList.clear()
+                p = mp.Process(target = writer, args=[wordsList, filename, str(count//batch)])
+                p.start()
+                processes.append(p)
+                wordsList.clear()
+
+            else:
+                wordsList.clear()
             
-    filename = path + str(start) + "-characters/" + str(start) + "-character-iteration-part-" + str((count//batch)+1) + ".txt"
-    p = mp.Process(target = writer, args=[wordsList, filename, str((count//batch)+1)])
-    processes.append(p)
-    p.start()
-    wordsList.clear()
+    if count//batch > mid:
+        filename = path + str(start) + "-characters/" + str(start) + "-character-iteration-part-" + str((count//batch)+1) + ".txt"
+        p = mp.Process(target = writer, args=[wordsList, filename, str((count//batch)+1)])
+        processes.append(p)
+        p.start()
+        wordsList.clear()
+
+    else:
+        wordsList.clear()
 
     for i in processes:
         i.join()
@@ -55,6 +63,7 @@ if __name__ == "__main__":
     new_parser.add_argument("-e", "--end", help = "character end count", type = int)
     new_parser.add_argument("-p", "--path", help = "path in which the files will be stored", type = str)
     new_parser.add_argument("-b", "--batch", help = "enter the batches in which the data is to be split", type = int)
+    new_parser.add_argument("-f", "--fileNo", help = "enter the batches in which the data is to be split", type = int)
 
     arguments = new_parser.parse_args()
 
@@ -66,6 +75,11 @@ if __name__ == "__main__":
         end = arguments.end
     else:
         end = start
+
+    if arguments.fileNo:
+        fileNo = arguments.fileNo
+    else:
+        fileNo = 0
 
     for i in range(start, end+1):
 
@@ -82,7 +96,7 @@ if __name__ == "__main__":
     iterProcesses = []
 
     for i in range(0, end+1 - start):
-        p = mp.Process(target = txtWriter, args = [start, arguments.batch, arguments.path])
+        p = mp.Process(target = txtWriter, args = [start, arguments.batch, arguments.path, fileNo])
         p.start()
         iterProcesses.append(p)
         start += 1
