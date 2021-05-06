@@ -7,7 +7,7 @@ import psutil
 import argparse
 import time
 import os
-    
+import re
 class Menu:
 
     def __init__(self):
@@ -119,8 +119,12 @@ def txtWriter(start, batch, path, mid):
     processes = []
 
     for i in product(ascii_lowercase, repeat = start):
+        w = "".join(i)
+        x = re.search(r"(\w)\1{3,}", w)
+        
+        if x == None:
+            wordsList.append(w)
 
-        wordsList.append("".join(i))
         count += 1
 
         if count % batch == 0 and count > 1: 
